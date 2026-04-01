@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feastly — Order Food You Love</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCartPanel()"></div>
+
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-header">
+    <h3>🛒 Your Order</h3>
+    <button class="close-cart" onclick="toggleCartPanel()">✕</button>
+  </div>
+  <div class="cart-restaurant-bar" id="cartRestaurantBar" style="display:none">
+    📍 <span id="cartRestaurantName">—</span>
+  </div>
+  <ul class="cart-list" id="cartList">
+    <li class="cart-empty">
+      <div class="cart-empty-icon">🍽️</div>
+      <p>Your cart is empty.<br/>Browse restaurants to add items.</p>
+    </li>
+  </ul>
+  <div class="cart-summary" id="cartSummaryBlock" style="display:none">
+    <div class="cart-bill-row"><span>Item Total</span><span id="cartItemTotal">₹0</span></div>
+    <div class="cart-bill-row"><span>Delivery Fee</span><span id="cartDeliveryFee">₹0</span></div>
+    <div class="cart-bill-row"><span>Taxes &amp; GST (5%)</span><span id="cartTax">₹0</span></div>
+    <div class="cart-bill-row total"><span>To Pay</span><span id="cartTotal">₹0</span></div>
+  </div>
+  <button class="cart-checkout-btn" id="cartCheckoutBtn" onclick="openPayment()">Proceed to Payment →</button>
+</div>
+
+<header class="site-header" id="home">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">🍔</span>
+      <span class="logo-text">Feast<strong>ly</strong></span>
+    </a>
+    <div class="location-pill">
+      <span class="pin">📍</span>
+      <span>Chennai, TN</span>
+    </div>
+    <nav class="navbar">
+      <a href="#home"        class="nav-link active">Home</a>
+      <a href="#restaurants" class="nav-link">Restaurants</a>
+      <a href="#offers"      class="nav-link">Offers</a>
+      <a href="#contact"     class="nav-link">Join Us</a>
+    </nav>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input"
+             placeholder="Search restaurants or dishes…"
+             autocomplete="off" oninput="searchRestaurants()" />
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+    <div class="cart-wrapper" onclick="toggleCartPanel()">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+    <div id="headerUserArea"></div>
+  </div>
+</header>
+
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🚀 Now delivering in 30 mins</div>
+      <h1 class="hero-title">Order Food You<br/><span>Truly Love</span></h1>
+      <p class="hero-desc">Discover top restaurants, cafés, and cloud kitchens near you. Fresh food, fast delivery — every single time.</p>
+      <div class="hero-cta">
+        <a href="#restaurants" class="btn-primary">Explore Restaurants 🍽️</a>
+        <a href="#offers" class="btn-outline">View Offers</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num">500+</div>
+          <div class="hero-stat-label">Restaurants</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">30 min</div>
+          <div class="hero-stat-label">Avg. Delivery</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">4.8★</div>
+          <div class="hero-stat-label">App Rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-image-box">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80" alt="Delicious Food" />
+  </div>
+</section>
+
+<div class="marquee-wrapper">
+  <div class="marquee-track">
+    <span>🔥 Free delivery on orders above ₹199 &nbsp;|&nbsp; Use code FEAST50 for ₹50 OFF &nbsp;|&nbsp; NEW: Cloud Kitchen specials every Friday &nbsp;|&nbsp; Refer a friend &amp; earn ₹100 cashback &nbsp;|&nbsp; 🔥 Free delivery on orders above ₹199 &nbsp;|&nbsp; Use code FEAST50 for ₹50 OFF &nbsp;|&nbsp; NEW: Cloud Kitchen specials every Friday &nbsp;|&nbsp; Refer a friend &amp; earn ₹100 cashback &nbsp;|&nbsp;</span>
+  </div>
+</div>
+
+<section class="categories-section" id="categories">
+  <div class="container">
+    <h2 class="section-title">What are you <span>craving?</span></h2>
+    <div class="cuisine-chips" id="filterBar">
+      <button class="filter-btn active" onclick="filterRestaurants('All', this)">🍽️ All</button>
+      <button class="filter-btn" onclick="filterRestaurants('rating', this)">⭐ Rating 4+</button>
+      <button class="filter-btn" onclick="filterRestaurants('fast', this)">⚡ Fast Delivery</button>
+      <button class="filter-btn" onclick="filterRestaurants('veg', this)">🥗 Pure Veg</button>
+      <button class="filter-btn" onclick="filterRestaurants('under200', this)">💰 Under ₹200</button>
+    </div>
+    <div class="cuisine-grid">
+      <div class="cuisine-card" onclick="filterByCuisine('Biryani')"><div class="c-icon">🍛</div><span>Biryani</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Pizza')"><div class="c-icon">🍕</div><span>Pizza</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Burger')"><div class="c-icon">🍔</div><span>Burgers</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('South Indian')"><div class="c-icon">🥘</div><span>South Indian</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Chinese')"><div class="c-icon">🍜</div><span>Chinese</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Cafe')"><div class="c-icon">☕</div><span>Cafe</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Desserts')"><div class="c-icon">🍰</div><span>Desserts</span></div>
+      <div class="cuisine-card" onclick="filterByCuisine('Sandwich')"><div class="c-icon">🥪</div><span>Sandwich</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="products-section" id="restaurants">
+  <div class="container">
+    <div class="listing-topbar">
+      <h2 class="section-title" style="margin-bottom:0">
+        Restaurants near you <span class="count" id="restaurantCount"></span>
+      </h2>
+    </div>
+    <div class="restaurant-grid" id="restaurantGrid"></div>
+    <div class="no-results" id="noResults" style="display:none">
+      <div class="no-results-icon">🔍</div>
+      <p>No restaurants match your search.<br/>Try a different keyword or filter.</p>
+    </div>
+  </div>
+</section>
+
+<section class="offers-section" id="offers">
+  <div class="container">
+    <h2 class="section-title light">Hot <span>Deals</span> Today</h2>
+    <div class="offers-grid">
+      <div class="offer-card">
+        <span class="offer-badge">LIMITED TIME</span>
+        <img src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=75" alt="Pizza Deal" loading="lazy" />
+        <div class="offer-body">
+          <h4>Buy 1 Get 1 Free — Pizza</h4>
+          <p>Valid at La Pino'z, Domino's &amp; 12 more pizza joints this weekend only.</p>
+          <span class="offer-code">PIZZABOGO</span>
+        </div>
+      </div>
+      <div class="offer-card">
+        <span class="offer-badge">₹80 OFF</span>
+        <img src="https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=600&q=75" alt="Biryani Deal" loading="lazy" />
+        <div class="offer-body">
+          <h4>Biryani Bonanza — ₹80 OFF</h4>
+          <p>Flat ₹80 off on orders above ₹299 from Nandhana Palace &amp; select biryani spots.</p>
+          <span class="offer-code">BIRYANI80</span>
+        </div>
+      </div>
+      <div class="offer-card">
+        <span class="offer-badge">FREE DELIVERY</span>
+        <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=75" alt="Burger Deal" loading="lazy" />
+        <div class="offer-body">
+          <h4>Free Delivery — Burger Week</h4>
+          <p>Zero delivery fee on all burger orders. Use the code at checkout — today only!</p>
+          <span class="offer-code">BURGERFREE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-section" id="contact">
+  <div class="container">
+    <div class="form-container">
+      <div class="form-info">
+        <h2 class="section-title">Join <span>Feastly</span> Today</h2>
+        <p>Sign up to get personalised recommendations, exclusive deals, and faster checkout every time you order.</p>
+        <ul class="form-perks">
+          <li>🎁 ₹100 off on your first order</li>
+          <li>⚡ Priority delivery slots</li>
+          <li>💳 Saved addresses &amp; payment methods</li>
+          <li>📦 Real-time order tracking</li>
+          <li>🏷️ Members-only flash deals</li>
+        </ul>
+      </div>
+      <div class="registration-form">
+        <h3>Create Your Account</h3>
+        <form id="registrationForm" onsubmit="submitForm(event)">
+          <div class="form-group">
+            <label for="custName">Full Name <span>*</span></label>
+            <input type="text" id="custName" name="custName" placeholder="Your full name" required />
+          </div>
+          <div class="form-group">
+            <label for="custEmail">Email Address <span>*</span></label>
+            <input type="email" id="custEmail" name="custEmail" placeholder="you@example.com" required />
+          </div>
+          <div class="form-group">
+            <label for="custPhone">Mobile Number <span>*</span></label>
+            <input type="number" id="custPhone" name="custPhone" placeholder="10-digit mobile number" required />
+          </div>
+          <div class="form-group">
+            <label>Gender <span>*</span></label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="gender" value="Male" required /> Male</label>
+              <label class="radio-label"><input type="radio" name="gender" value="Female" /> Female</label>
+              <label class="radio-label"><input type="radio" name="gender" value="Other" /> Other</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="prefCategory">Favourite Cuisine</label>
+            <select id="prefCategory" name="prefCategory">
+              <option value="">-- Select Cuisine --</option>
+              <option value="Biryani">Biryani</option>
+              <option value="Pizza">Pizza</option>
+              <option value="Burger">Burger</option>
+              <option value="South Indian">South Indian</option>
+              <option value="Chinese">Chinese</option>
+              <option value="Desserts">Desserts</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="address">Delivery Address <span>*</span></label>
+            <textarea id="address" name="address" rows="3" placeholder="Flat No., Street, Area, City, PIN" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="feedback">Any dietary preferences?</label>
+            <textarea id="feedback" name="feedback" rows="2" placeholder="E.g. nut allergy, pure veg only…"></textarea>
+          </div>
+          <button type="submit" class="btn-primary full">Create Account 🚀</button>
+          <div class="form-success" id="formSuccess" style="display:none;">
+            🎉 Welcome to Feastly! Your ₹100 discount is ready on your first order.
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="marquee-wrapper">
+    <div class="marquee-track">
+      <span>🍔 500+ Restaurants &nbsp;|&nbsp; ⚡ 30-min Delivery &nbsp;|&nbsp; 🎁 Free Delivery Above ₹199 &nbsp;|&nbsp; 💳 10+ Payment Options &nbsp;|&nbsp; 🍔 500+ Restaurants &nbsp;|&nbsp; ⚡ 30-min Delivery &nbsp;|&nbsp; 🎁 Free Delivery Above ₹199 &nbsp;|&nbsp; 💳 10+ Payment Options &nbsp;|&nbsp;</span>
+    </div>
+  </div>
+  <div class="footer-main">
+    <div class="footer-col">
+      <div class="logo"><span class="logo-icon">🍔</span><span class="logo-text">Feast<strong>ly</strong></span></div>
+      <p class="footer-desc">Your go-to food delivery platform. Fresh food, fast delivery, great prices.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#home">Home</a></li>
+        <li><a href="#restaurants">Restaurants</a></li>
+        <li><a href="#offers">Offers</a></li>
+        <li><a href="#contact">Join Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Cuisines</h4>
+      <ul>
+        <li><a href="#restaurants">Biryani</a></li>
+        <li><a href="#restaurants">Pizza</a></li>
+        <li><a href="#restaurants">Burgers</a></li>
+        <li><a href="#restaurants">South Indian</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <ul class="contact-list">
+        <li>📧 support@feastly.in</li>
+        <li>📞 1800-FEASTLY</li>
+        <li>📍 Chennai, Tamil Nadu</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom"><p>© 2025 Feastly. All Rights Reserved. Made with ❤️ for food lovers.</p></div>
+</footer>
+
+<div id="paymentModal">
+  <div class="payment-card">
+    <div id="payFormView">
+      <div class="pay-header">
+        <div class="pay-header-text">
+          <h3>🔒 Secure Checkout</h3>
+          <p>Review your order and complete payment</p>
+        </div>
+        <button class="close-payment" onclick="closePayment()">✕</button>
+      </div>
+      <div class="pay-body">
+        <div class="pay-address-block">
+          <div class="pay-address-icon">📍</div>
+          <div class="pay-address-text">
+            <strong>Delivering to</strong>
+            VIT Chennai, Kelambakkam – Vandalur Road, Tamil Nadu 600127
+          </div>
+        </div>
+        <div class="pay-eta">⏱️ Estimated delivery: <strong id="payETA">30–40 mins</strong></div>
+        <div class="order-summary">
+          <div class="order-summary-title">Order Summary</div>
+          <div id="payOrderItems"></div>
+          <div class="order-line fee"><span>Delivery Fee</span><span id="payDeliveryFee">₹0</span></div>
+          <div class="order-line fee"><span>Taxes &amp; GST (5%)</span><span id="payTax">₹0</span></div>
+          <div class="order-total-row">
+            <span>Total Amount</span>
+            <span id="payOrderTotal">₹0</span>
+          </div>
+        </div>
+        <div class="pay-method-label">Select Payment Method</div>
+        <div class="pay-methods">
+          <button class="pay-tab active" onclick="selectPayMethod('card',this)">💳<br/>Card</button>
+          <button class="pay-tab" onclick="selectPayMethod('upi',this)">📱<br/>UPI</button>
+          <button class="pay-tab" onclick="selectPayMethod('netbanking',this)">🏦<br/>Net Banking</button>
+          <button class="pay-tab" onclick="selectPayMethod('cod',this)">💰<br/>COD</button>
+        </div>
+        <div class="pay-fields visible" id="fields-card">
+          <div class="pay-field-group">
+            <label>Card Number</label>
+            <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNum(this)" />
+          </div>
+          <div class="pay-row">
+            <div class="pay-field-group">
+              <label>Expiry Date</label>
+              <input type="text" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" />
+            </div>
+            <div class="pay-field-group">
+              <label>CVV</label>
+              <input type="password" placeholder="•••" maxlength="3" />
+            </div>
+          </div>
+          <div class="pay-field-group">
+            <label>Name on Card</label>
+            <input type="text" placeholder="Full name as on card" />
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-upi">
+          <div class="upi-body">
+            <p>Enter your UPI ID to complete payment</p>
+            <input type="text" placeholder="yourname@upi" />
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-netbanking">
+          <div class="pay-field-group">
+            <label>Select Your Bank</label>
+            <select>
+              <option value="">-- Choose Bank --</option>
+              <option>State Bank of India</option>
+              <option>HDFC Bank</option>
+              <option>ICICI Bank</option>
+              <option>Axis Bank</option>
+              <option>Kotak Mahindra Bank</option>
+              <option>Punjab National Bank</option>
+            </select>
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-cod">
+          <div class="cod-body">💵 Pay with cash when your order arrives.<br/><br/>A handling charge of ₹20 applies on COD orders.</div>
+        </div>
+        <button class="btn-pay-now" id="payNowBtn" onclick="processPayment()">Place Order ✓</button>
+        <div class="secure-badge">🔒 256-bit SSL Encrypted · 100% Safe &amp; Secure</div>
+      </div>
+    </div>
+    <div class="pay-success" id="paySuccessView">
+      <div class="success-icon">🎉</div>
+      <h3>Order Placed!</h3>
+      <p>Your food is being prepared. You'll receive updates on your order.</p>
+      <div class="success-order-id" id="successOrderId">Order #FL000000</div>
+      <span class="success-delivery" id="successETA">Estimated delivery: 30–40 mins</span>
+      <button class="btn-continue" onclick="continueShopping()">Back to Restaurants →</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

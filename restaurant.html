@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feastly — Menu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Menu page specifics ── */
+    .menu-hero {
+      background: var(--clr-dark);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      align-items: flex-end;
+    }
+    .menu-hero-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+    .menu-hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 28px 32px 24px;
+      width: 100%;
+      background: linear-gradient(to top, rgba(26,6,8,.95) 0%, transparent 100%);
+    }
+    .menu-hero-name {
+      font-family: var(--ff-heading);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .menu-hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .menu-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.85);
+    }
+    .menu-tag.rating-tag { background: var(--clr-success); border-color: var(--clr-success); color: #fff; }
+    .menu-hero-meta {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,.55);
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .menu-hero-meta span { display: flex; align-items: center; gap: 4px; }
+
+    /* Sticky menu nav */
+    .menu-sticky-nav {
+      background: var(--clr-light);
+      border-bottom: 1px solid var(--clr-border);
+      position: sticky;
+      top: 68px;
+      z-index: 100;
+    }
+    .menu-nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      height: 48px;
+      align-items: center;
+    }
+    .menu-nav-inner::-webkit-scrollbar { display: none; }
+    .menu-cat-btn {
+      padding: 6px 16px;
+      border: none;
+      background: none;
+      font-family: var(--ff-body);
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--clr-muted);
+      cursor: pointer;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: all var(--ease);
+      flex-shrink: 0;
+    }
+    .menu-cat-btn:hover { color: var(--clr-primary); background: var(--clr-primary-lt); }
+    .menu-cat-btn.active {
+      color: var(--clr-primary);
+      background: var(--clr-primary-lt);
+      font-weight: 700;
+    }
+
+    /* Layout: sidebar + main */
+    .menu-layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* Menu sections */
+    .menu-section { margin-bottom: 36px; }
+    .menu-section-title {
+      font-family: var(--ff-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--clr-dark);
+      padding: 10px 0 14px;
+      border-bottom: 1px solid var(--clr-border);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-section-count {
+      font-family: var(--ff-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--clr-muted);
+      background: var(--clr-border);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* Menu item card */
+    .menu-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--clr-border);
+      animation: fadeRow .25s ease;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    @keyframes fadeRow {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .mi-veg-badge {
+      width: 16px; height: 16px;
+      border-radius: 3px;
+      border: 2px solid;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 3px;
+    }
+    .mi-veg-badge.veg   { border-color: var(--clr-success); }
+    .mi-veg-badge.veg::after {
+      content: ''; width: 7px; height: 7px;
+      background: var(--clr-success); border-radius: 50%;
+    }
+    .mi-veg-badge.nonveg { border-color: var(--clr-primary); }
+    .mi-veg-badge.nonveg::after {
+      content: ''; width: 7px; height: 7px;
+      background: var(--clr-primary); border-radius: 50%;
+    }
+
+    .mi-info { flex: 1; min-width: 0; }
+    .mi-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--clr-dark);
+      margin-bottom: 4px;
+    }
+    .mi-desc {
+      font-size: 0.8rem;
+      color: var(--clr-muted);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .mi-price {
+      font-family: var(--ff-heading);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--clr-dark);
+    }
+    .mi-tags { display: flex; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+    .mi-tag {
+      font-size: 0.7rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 4px;
+    }
+    .mi-tag.bestseller { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    .mi-tag.spicy      { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+    .mi-tag.new-item   { background: var(--clr-success-lt); color: var(--clr-success); border: 1px solid #86efac; }
+
+    /* Image + add button group */
+    .mi-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .mi-img {
+      width: 110px; height: 90px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--clr-border);
+    }
+    .mi-img-placeholder {
+      width: 110px; height: 90px;
+      background: var(--clr-light);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--clr-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.4rem;
+    }
+
+    /* Add / qty button */
+    .mi-add-btn {
+      width: 90px;
+      padding: 7px 0;
+      background: #fff;
+      color: var(--clr-primary);
+      border: 1.5px solid var(--clr-primary);
+      border-radius: var(--radius-xs);
+      font-family: var(--ff-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all var(--ease);
+      letter-spacing: 0.3px;
+    }
+    .mi-add-btn:hover { background: var(--clr-primary); color: #fff; }
+
+    .mi-qty-ctrl {
+      width: 90px;
+      display: flex; align-items: center; justify-content: space-between;
+      border: 1.5px solid var(--clr-primary);
+      border-radius: var(--radius-xs);
+      overflow: hidden;
+    }
+    .mi-qty-btn {
+      width: 28px; height: 30px;
+      background: var(--clr-primary);
+      color: #fff;
+      border: none;
+      font-size: 1rem; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background var(--ease);
+    }
+    .mi-qty-btn:hover { background: var(--clr-primary-dk); }
+    .mi-qty-val {
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--clr-primary);
+    }
+
+    /* ── Sticky cart sidebar ── */
+    .cart-sidebar {
+      position: sticky;
+      top: 120px;
+    }
+    .cart-sidebar-card {
+      background: #fff;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--clr-border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .cs-header {
+      background: var(--clr-dark);
+      color: #fff;
+      padding: 16px 20px;
+      font-family: var(--ff-heading);
+      font-size: 1rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .cs-empty {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--clr-muted);
+      font-size: 0.88rem;
+    }
+    .cs-empty-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    .cs-items { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .cs-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem;
+    }
+    .cs-item-name { flex: 1; font-weight: 600; color: var(--clr-dark); }
+    .cs-item-price { color: var(--clr-primary); font-weight: 700; white-space: nowrap; }
+    .cs-item-qty {
+      display: flex; align-items: center; gap: 4px;
+      border: 1px solid var(--clr-primary);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .cs-qty-btn {
+      width: 22px; height: 22px;
+      background: var(--clr-primary); color: #fff;
+      border: none; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cs-qty-val {
+      width: 22px; text-align: center;
+      font-size: 0.82rem; font-weight: 700; color: var(--clr-primary);
+    }
+    .cs-bill {
+      border-top: 1px solid var(--clr-border);
+      padding: 12px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .cs-bill-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.82rem; color: var(--clr-muted);
+    }
+    .cs-bill-row.total {
+      font-size: 0.95rem; font-weight: 700; color: var(--clr-dark);
+      border-top: 1px dashed var(--clr-border);
+      padding-top: 8px; margin-top: 4px;
+    }
+    .cs-bill-row.total span:last-child {
+      color: var(--clr-primary); font-family: var(--ff-heading); font-size: 1.1rem;
+    }
+    .cs-checkout-btn {
+      display: block; width: 100%;
+      padding: 14px;
+      background: var(--clr-primary); color: #fff;
+      border: none;
+      font-family: var(--ff-body); font-size: 0.95rem; font-weight: 700;
+      cursor: pointer;
+      transition: background var(--ease);
+    }
+    .cs-checkout-btn:hover { background: var(--clr-primary-dk); }
+    .cs-checkout-btn:disabled { background: var(--clr-muted); cursor: not-allowed; }
+
+    @media (max-width: 900px) {
+      .menu-layout { grid-template-columns: 1fr; }
+      .cart-sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Cart overlay & panel (reused from index) -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCartPanel()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-header">
+    <h3>🛒 Your Order</h3>
+    <button class="close-cart" onclick="toggleCartPanel()">✕</button>
+  </div>
+  <div class="cart-restaurant-bar" id="cartRestaurantBar" style="display:none">
+    📍 <span id="cartRestaurantName">—</span>
+  </div>
+  <ul class="cart-list" id="cartList">
+    <li class="cart-empty">
+      <div class="cart-empty-icon">🍽️</div>
+      <p>Your cart is empty.</p>
+    </li>
+  </ul>
+  <div class="cart-summary" id="cartSummaryBlock" style="display:none">
+    <div class="cart-bill-row"><span>Item Total</span><span id="cartItemTotal">₹0</span></div>
+    <div class="cart-bill-row"><span>Delivery Fee</span><span id="cartDeliveryFee">₹0</span></div>
+    <div class="cart-bill-row"><span>Taxes &amp; GST (5%)</span><span id="cartTax">₹0</span></div>
+    <div class="cart-bill-row total"><span>To Pay</span><span id="cartTotal">₹0</span></div>
+  </div>
+  <button class="cart-checkout-btn" id="cartCheckoutBtn" onclick="openPayment()">Proceed to Payment →</button>
+</div>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">🍔</span>
+      <span class="logo-text">Feast<strong>ly</strong></span>
+    </a>
+    <div class="location-pill"><span class="pin">📍</span><span>Chennai, TN</span></div>
+    <nav class="navbar">
+      <a href="index.html" class="nav-link">Home</a>
+      <a href="index.html#restaurants" class="nav-link">Restaurants</a>
+      <a href="index.html#offers" class="nav-link">Offers</a>
+    </nav>
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" class="search-input"
+             placeholder="Search menu items…"
+             autocomplete="off" oninput="searchMenuItems()" />
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+    <div class="cart-wrapper" onclick="toggleCartPanel()">
+      <span class="cart-icon">🛒</span>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+    <div id="headerUserArea"></div>
+  </div>
+</header>
+
+<!-- Restaurant Hero Banner -->
+<div class="menu-hero" id="menuHero">
+  <img class="menu-hero-img" id="menuHeroImg" src="" alt="" />
+  <div class="menu-hero-content">
+    <div class="menu-hero-name" id="menuHeroName">Loading…</div>
+    <div class="menu-hero-tags" id="menuHeroTags"></div>
+    <div class="menu-hero-meta" id="menuHeroMeta"></div>
+  </div>
+</div>
+
+<!-- Menu Category Nav -->
+<div class="menu-sticky-nav">
+  <div class="menu-nav-inner" id="menuNavInner"></div>
+</div>
+
+<!-- Menu Layout -->
+<div class="menu-layout">
+  <!-- Left: Menu items -->
+  <div id="menuSections">
+    <p style="color:var(--clr-muted);padding:40px 0;text-align:center">Loading menu…</p>
+  </div>
+
+  <!-- Right: Sticky order summary -->
+  <div class="cart-sidebar">
+    <div class="cart-sidebar-card">
+      <div class="cs-header">🛒 Your Order</div>
+      <div id="sidebarCartBody">
+        <div class="cs-empty">
+          <div class="cs-empty-icon">🍽️</div>
+          <p>Add items from the menu to get started</p>
+        </div>
+      </div>
+      <div class="cs-bill" id="sidebarBill" style="display:none">
+        <div class="cs-bill-row"><span>Item Total</span><span id="sbItemTotal">₹0</span></div>
+        <div class="cs-bill-row"><span>Delivery Fee</span><span id="sbDelivery">₹0</span></div>
+        <div class="cs-bill-row"><span>Taxes (5%)</span><span id="sbTax">₹0</span></div>
+        <div class="cs-bill-row total"><span>To Pay</span><span id="sbTotal">₹0</span></div>
+      </div>
+      <button class="cs-checkout-btn" id="sidebarCheckoutBtn" onclick="openPayment()" disabled>
+        Add items to checkout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment Modal (same as index) -->
+<div id="paymentModal">
+  <div class="payment-card">
+    <div id="payFormView">
+      <div class="pay-header">
+        <div class="pay-header-text">
+          <h3>🔒 Secure Checkout</h3>
+          <p>Review your order and complete payment</p>
+        </div>
+        <button class="close-payment" onclick="closePayment()">✕</button>
+      </div>
+      <div class="pay-body">
+        <div class="pay-address-block">
+          <div class="pay-address-icon">📍</div>
+          <div class="pay-address-text">
+            <strong>Delivering to</strong>
+            VIT Chennai, Kelambakkam – Vandalur Road, Tamil Nadu 600127
+          </div>
+        </div>
+        <div class="pay-eta">⏱️ Estimated delivery: <strong id="payETA">30–40 mins</strong></div>
+        <div class="order-summary">
+          <div class="order-summary-title">Order Summary</div>
+          <div id="payOrderItems"></div>
+          <div class="order-line fee"><span>Delivery Fee</span><span id="payDeliveryFee">₹0</span></div>
+          <div class="order-line fee"><span>Taxes &amp; GST (5%)</span><span id="payTax">₹0</span></div>
+          <div class="order-total-row">
+            <span>Total Amount</span>
+            <span id="payOrderTotal">₹0</span>
+          </div>
+        </div>
+        <div class="pay-method-label">Select Payment Method</div>
+        <div class="pay-methods">
+          <button class="pay-tab active" onclick="selectPayMethod('card',this)">💳<br/>Card</button>
+          <button class="pay-tab" onclick="selectPayMethod('upi',this)">📱<br/>UPI</button>
+          <button class="pay-tab" onclick="selectPayMethod('netbanking',this)">🏦<br/>Net Banking</button>
+          <button class="pay-tab" onclick="selectPayMethod('cod',this)">💰<br/>COD</button>
+        </div>
+        <div class="pay-fields visible" id="fields-card">
+          <div class="pay-field-group">
+            <label>Card Number</label>
+            <input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNum(this)" />
+          </div>
+          <div class="pay-row">
+            <div class="pay-field-group">
+              <label>Expiry Date</label>
+              <input type="text" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)" />
+            </div>
+            <div class="pay-field-group">
+              <label>CVV</label>
+              <input type="password" placeholder="•••" maxlength="3" />
+            </div>
+          </div>
+          <div class="pay-field-group">
+            <label>Name on Card</label>
+            <input type="text" placeholder="Full name as on card" />
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-upi">
+          <div class="upi-body">
+            <p>Enter your UPI ID to complete payment</p>
+            <input type="text" placeholder="yourname@upi" />
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-netbanking">
+          <div class="pay-field-group">
+            <label>Select Your Bank</label>
+            <select>
+              <option value="">-- Choose Bank --</option>
+              <option>State Bank of India</option><option>HDFC Bank</option>
+              <option>ICICI Bank</option><option>Axis Bank</option>
+              <option>Kotak Mahindra Bank</option>
+            </select>
+          </div>
+        </div>
+        <div class="pay-fields" id="fields-cod">
+          <div class="cod-body">💵 Pay with cash when your order arrives.<br/><br/>A handling charge of ₹20 applies on COD.</div>
+        </div>
+        <button class="btn-pay-now" id="payNowBtn" onclick="processPayment()">Place Order ✓</button>
+        <div class="secure-badge">🔒 256-bit SSL Encrypted · 100% Safe &amp; Secure</div>
+      </div>
+    </div>
+    <div class="pay-success" id="paySuccessView">
+      <div class="success-icon">🎉</div>
+      <h3>Order Placed!</h3>
+      <p>Your food is being prepared. You'll receive updates on your order.</p>
+      <div class="success-order-id" id="successOrderId">Order #FL000000</div>
+      <span class="success-delivery" id="successETA">Estimated delivery: 30–40 mins</span>
+      <button class="btn-continue" onclick="continueShopping()">Back to Restaurants →</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
