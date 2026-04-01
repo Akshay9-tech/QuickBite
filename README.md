@@ -55,7 +55,7 @@ Feastly is a food delivery web application inspired by platforms like Zomato and
 ---
 ## Live Demo
 
-Visit the application: https://your-username.github.io/feastly/
+Visit the application: https://Akshay9-tech.github.io/feastly/
 
 ## Author
 
